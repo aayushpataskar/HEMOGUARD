@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+
+# Large model files (consider using Git LFS for these)
+*.pkl
+*.pt
+
+# Archive/backup
+archive/
+esp32_hii_monitor_wifi - Copy - Copy/
+
+# Data files (optional - remove if you want to include them)
+# *.csv

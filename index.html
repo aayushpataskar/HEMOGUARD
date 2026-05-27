@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hemoguard — Real-Time Hemodynamic Monitor</title>
+  <meta name="description" content="Real-time wireless biomedical monitoring dashboard for hemodynamic instability detection." />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ═══════ HEADER ═══════ -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">H</div>
+      <h1>
+        Hemoguard
+        <span>Hemodynamic Instability Monitor</span>
+      </h1>
+    </div>
+    <div class="header-right">
+      <div id="conn-badge" class="conn-badge simulating">
+        <span class="conn-dot"></span>
+        <span id="conn-text">Simulating</span>
+      </div>
+      <div class="timestamp" id="timestamp">--:--:--.---</div>
+    </div>
+  </header>
+
+  <!-- ═══════ CONTROLS ═══════ -->
+  <div class="controls-bar">
+    <select id="patient-select" class="patient-select" aria-label="Select patient">
+      <option value="patient-1">Patient 1 — John D.</option>
+      <option value="patient-2">Patient 2 — Sarah M.</option>
+      <option value="patient-3">Patient 3 — Raj K.</option>
+    </select>
+
+    <button id="mode-toggle" class="mode-toggle sim" type="button">
+      <span class="mode-dot"></span>
+      <span id="mode-label">SIMULATION</span>
+    </button>
+
+    <div class="ip-input-group">
+      <label for="esp-ip">ESP32 IP:</label>
+      <input id="esp-ip" class="ip-input" type="text" placeholder="192.168.x.x" />
+    </div>
+  </div>
+
+  <!-- ═══════ MAIN GRID ═══════ -->
+  <div class="grid">
+
+    <!-- ECG Waveform -->
+    <div class="card ecg-card">
+      <div class="card-title">
+        <span class="icon">⚡</span> ECG Waveform
+      </div>
+      <div class="chart-container">
+        <canvas id="ecg-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- PPG Waveform -->
+    <div class="card ppg-card">
+      <div class="card-title">
+        <span class="icon">💜</span> PPG Waveform
+      </div>
+      <div class="chart-container">
+        <canvas id="ppg-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- Status Card -->
+    <div class="card status-card">
+      <div class="card-title">
+        <span class="icon">🔔</span> Patient Status
+      </div>
+      <div class="status-label">Hemodynamic Status</div>
+      <div id="status-box" class="status-box stable">STABLE</div>
+      <div class="hii-value" id="hii-value">0.000</div>
+      <div class="hii-sub">Hemodynamic Instability Index</div>
+    </div>
+
+    <!-- Vitals Panel -->
+    <div class="card vitals-card">
+      <div class="card-title">
+        <span class="icon">📊</span> Vital Metrics
+      </div>
+      <div class="vitals-grid">
+
+        <div class="vital-item">
+          <div class="vital-label">PPG Amplitude</div>
+          <div class="vital-value" id="v-ppgamp">—</div>
+          <span class="vital-trend flat" id="t-ppgamp">—</span>
+          <div class="vital-unit">a.u.</div>
+        </div>
+
+        <div class="vital-item">
+          <div class="vital-label">PTT</div>
+          <div class="vital-value" id="v-ptt">—</div>
+          <span class="vital-trend flat" id="t-ptt">—</span>
+          <div class="vital-unit">ms</div>
+        </div>
+
+        <div class="vital-item">
+          <div class="vital-label">Temp Gradient</div>
+          <div class="vital-value" id="v-tempgrad">—</div>
+          <span class="vital-trend flat" id="t-tempgrad">—</span>
+          <div class="vital-unit">°C</div>
+        </div>
+
+        <div class="vital-item">
+          <div class="vital-label">Bioimpedance ΔZ</div>
+          <div class="vital-value" id="v-bio">—</div>
+          <span class="vital-trend flat" id="t-bio">—</span>
+          <div class="vital-unit">Ω</div>
+        </div>
+
+        <div class="vital-item">
+          <div class="vital-label">HII Index</div>
+          <div class="vital-value" id="v-hii">—</div>
+          <span class="vital-trend flat" id="t-hii">—</span>
+          <div class="vital-unit">score</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Sensor Status -->
+    <div class="card sensor-card">
+      <div class="card-title">
+        <span class="icon">📡</span> Sensor Status
+      </div>
+      <ul class="sensor-list">
+        <li class="sensor-item" id="sensor-ecg">
+          <span class="sensor-dot active"></span>
+          <span class="sensor-name">ECG Electrodes</span>
+          <span class="sensor-status-text active">Detected</span>
+        </li>
+        <li class="sensor-item" id="sensor-ppg">
+          <span class="sensor-dot active"></span>
+          <span class="sensor-name">PPG Sensor (MAX30102)</span>
+          <span class="sensor-status-text active">Detected</span>
+        </li>
+        <li class="sensor-item" id="sensor-temp">
+          <span class="sensor-dot active"></span>
+          <span class="sensor-name">Temperature (DS18B20)</span>
+          <span class="sensor-status-text active">Detected</span>
+        </li>
+        <li class="sensor-item" id="sensor-bio">
+          <span class="sensor-dot active"></span>
+          <span class="sensor-name">Bioimpedance (AD5933)</span>
+          <span class="sensor-status-text active">Detected</span>
+        </li>
+      </ul>
+    </div>
+
+  </div><!-- /grid -->
+
+</div><!-- /app -->
+
+<script src="script.js"></script>
+</body>
+</html>
