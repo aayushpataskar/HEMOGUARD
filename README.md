@@ -1,5 +1,7 @@
 # HEMOGUARD AI ESP32 Biomedical Monitoring System
 
+Hemoguard is an AI-powered multimodal wearable system for early detection of internal bleeding and hemodynamic instability before traditional vital signs change. Using ECG, PPG, Pulse Transit Time (PTT), bioimpedance, temperature gradient, HRV, and intelligent signal fusion, it enables real-time physiological risk assessment and monitoring.
+
 A comprehensive, edge-based biomedical monitoring system running on the ESP32. It integrates real-time physiological data from multiple sensors (ECG, PPG, Bioimpedance, Temperature) and uses a Hybrid ML model (LSTM + Random Forest) to predict the patient's condition (Stable, Warning, Critical) continuously. The device features a local web dashboard accessible via WiFi for real-time visualization and monitoring.
 
 ## 🚀 Features
