@@ -1,5 +1,10 @@
 import numpy as np
 import pandas as pd
+import os
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR   = os.path.dirname(SCRIPT_DIR)  # project root
+DATA_DIR   = os.path.join(BASE_DIR, 'datasets')
 
 data = []
 
@@ -58,5 +63,6 @@ columns = [
 
 df = pd.DataFrame(data, columns=columns)
 df = df.sample(frac=1).reset_index(drop=True)
-df.to_csv("hemoguard_data.csv", index=False)
-print("Dataset generated: hemoguard_data.csv")
+out_path = os.path.join(DATA_DIR, "hemoguard_data.csv")
+df.to_csv(out_path, index=False)
+print(f"Dataset generated: {out_path}")

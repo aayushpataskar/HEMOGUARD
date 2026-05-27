@@ -17,7 +17,10 @@ from datetime import datetime
 from collections import deque
 from fastapi.middleware.cors import CORSMiddleware
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+WEB_DIR  = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(WEB_DIR)  # project root
+MODEL_DIR = os.path.join(BASE_DIR, 'models')
+DATA_DIR  = os.path.join(BASE_DIR, 'datasets')
 
 # ── Data Models ──────────────────────────────────────────────────
 class PatientData(BaseModel):
@@ -39,18 +42,18 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
 # ── Serve Frontend ───────────────────────────────────────────────
 @app.get("/")
 def serve_index():
-    return FileResponse(os.path.join(BASE_DIR, "index2.html"))
+    return FileResponse(os.path.join(WEB_DIR, "index2.html"))
 
-app.mount("/static", StaticFiles(directory=BASE_DIR), name="static")
+app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
 
 # Serve CSS/JS directly at root level (index2.html references them without /static/)
 @app.get("/style2.css")
 def serve_css():
-    return FileResponse(os.path.join(BASE_DIR, "style2.css"), media_type="text/css")
+    return FileResponse(os.path.join(WEB_DIR, "style2.css"), media_type="text/css")
 
 @app.get("/script2.js")
 def serve_js():
-    return FileResponse(os.path.join(BASE_DIR, "script2.js"), media_type="application/javascript")
+    return FileResponse(os.path.join(WEB_DIR, "script2.js"), media_type="application/javascript")
 
 FEATURE_COLS = ['HR','HR_slope','PTT','PTT_slope','PPG','PPG_slope',
                 'Imp','Imp_slope','Temp','Temp_slope']
@@ -65,10 +68,10 @@ model_meta = None
 rf_weights = None
 seq_len = 10
 
-lstm_path   = os.path.join(BASE_DIR, 'hemoguard_lstm.pt')
-rf_path     = os.path.join(BASE_DIR, 'hemoguard_rf_weights.pkl')
-scaler_path = os.path.join(BASE_DIR, 'hemoguard_scaler.pkl')
-meta_path   = os.path.join(BASE_DIR, 'hemoguard_model_meta.json')
+lstm_path   = os.path.join(MODEL_DIR, 'hemoguard_lstm.pt')
+rf_path     = os.path.join(MODEL_DIR, 'hemoguard_rf_weights.pkl')
+scaler_path = os.path.join(MODEL_DIR, 'hemoguard_scaler.pkl')
+meta_path   = os.path.join(MODEL_DIR, 'hemoguard_model_meta.json')
 
 if all(os.path.exists(p) for p in [lstm_path, rf_path, scaler_path, meta_path]):
     try:
@@ -113,7 +116,7 @@ if all(os.path.exists(p) for p in [lstm_path, rf_path, scaler_path, meta_path]):
         HYBRID_MODE = False
 
 if not HYBRID_MODE:
-    rf_model = joblib.load(os.path.join(BASE_DIR, 'hemoguard_model.pkl'))
+    rf_model = joblib.load(os.path.join(MODEL_DIR, 'hemoguard_model.pkl'))
     print("[BACKEND] 🔧 Fallback mode: Random Forest only")
 
 # ── Sliding window buffer ────────────────────────────────────────
@@ -237,7 +240,7 @@ def model_info():
 @app.post("/record")
 def record_data(data: RecordData):
     try:
-        filename = os.path.join(BASE_DIR, "real_esp32_data.csv")
+        filename = os.path.join(DATA_DIR, "real_esp32_data.csv")
         file_exists = os.path.isfile(filename)
         with open(filename, mode='a', newline='') as f:
             w = csv.writer(f)

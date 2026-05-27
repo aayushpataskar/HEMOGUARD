@@ -4,11 +4,17 @@ import joblib
 import argparse
 import os
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR   = os.path.dirname(SCRIPT_DIR)  # project root
+DATA_DIR   = os.path.join(BASE_DIR, 'datasets')
+MODEL_DIR  = os.path.join(BASE_DIR, 'models')
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--real', action='store_true', help='Use real_esp32_data.csv instead of synthetic hemoguard_data.csv')
 args = parser.parse_args()
 
-file_path = "real_esp32_data.csv" if args.real else "hemoguard_data.csv"
+filename = "real_esp32_data.csv" if args.real else "hemoguard_data.csv"
+file_path = os.path.join(DATA_DIR, filename)
 
 if not os.path.exists(file_path):
     print(f"Error: Dataset {file_path} not found!")
@@ -35,6 +41,7 @@ y = df[target_col]
 model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X, y)
 
-joblib.dump(model, "hemoguard_model.pkl")
-print("Model trained and saved: hemoguard_model.pkl")
+model_path = os.path.join(MODEL_DIR, "hemoguard_model.pkl")
+joblib.dump(model, model_path)
+print(f"Model trained and saved: {model_path}")
 print(f"Training accuracy: {model.score(X, y):.4f}")

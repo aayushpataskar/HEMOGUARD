@@ -34,7 +34,11 @@ from torch.utils.data import DataLoader, TensorDataset
 
 warnings.filterwarnings('ignore')
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR   = os.path.dirname(SCRIPT_DIR)  # project root
+MODEL_DIR  = os.path.join(BASE_DIR, 'models')
+DATA_DIR   = os.path.join(BASE_DIR, 'datasets')
+DOCS_DIR   = os.path.join(BASE_DIR, 'docs')
 
 # ══════════════════════════════════════════════════════════════════
 #  CONFIGURATION
@@ -68,7 +72,7 @@ print("=" * 65)
 # ══════════════════════════════════════════════════════════════════
 def load_datasets():
     frames = []
-    hemo_path = os.path.join(BASE_DIR, 'hemoguard_data.csv')
+    hemo_path = os.path.join(DATA_DIR, 'hemoguard_data.csv')
     if os.path.exists(hemo_path):
         df = pd.read_csv(hemo_path)
         target = 'label' if 'label' in df.columns else 'Label'
@@ -78,7 +82,7 @@ def load_datasets():
         frames.append(df[FEATURE_COLS + ['label']])
         print(f"[OK] hemoguard_data.csv → {len(df)} rows  |  {df['label'].value_counts().to_dict()}")
 
-    real_path = os.path.join(BASE_DIR, 'real_esp32_data.csv')
+    real_path = os.path.join(DATA_DIR, 'real_esp32_data.csv')
     if os.path.exists(real_path):
         df = pd.read_csv(real_path)
         for col in ['timestamp', 'session_id']:
@@ -488,24 +492,24 @@ def main():
 
     # 10. Visualise
     print("\n[STEP 10] Visualisations...")
-    plot_predictions(y_test, preds, probs, os.path.join(BASE_DIR, 'hybrid_predictions.png'))
-    plot_feature_importance(rf_importances, os.path.join(BASE_DIR, 'hybrid_feature_importance.png'))
+    plot_predictions(y_test, preds, probs, os.path.join(DOCS_DIR, 'hybrid_predictions.png'))
+    plot_feature_importance(rf_importances, os.path.join(DOCS_DIR, 'hybrid_feature_importance.png'))
 
     # 11. Save models
     print(f"\n{'═'*65}")
     print(f"  SAVING MODELS")
     print(f"{'═'*65}")
 
-    torch.save(lstm.state_dict(), os.path.join(BASE_DIR, 'hemoguard_lstm.pt'))
+    torch.save(lstm.state_dict(), os.path.join(MODEL_DIR, 'hemoguard_lstm.pt'))
     print(f"  [SAVED] LSTM          → hemoguard_lstm.pt")
 
-    joblib.dump(rf_model, os.path.join(BASE_DIR, 'hemoguard_rf_weights.pkl'))
+    joblib.dump(rf_model, os.path.join(MODEL_DIR, 'hemoguard_rf_weights.pkl'))
     print(f"  [SAVED] Random Forest → hemoguard_rf_weights.pkl")
 
-    joblib.dump(scaler, os.path.join(BASE_DIR, 'hemoguard_scaler.pkl'))
+    joblib.dump(scaler, os.path.join(MODEL_DIR, 'hemoguard_scaler.pkl'))
     print(f"  [SAVED] Scaler        → hemoguard_scaler.pkl")
 
-    joblib.dump(rf_model, os.path.join(BASE_DIR, 'hemoguard_model.pkl'))
+    joblib.dump(rf_model, os.path.join(MODEL_DIR, 'hemoguard_model.pkl'))
     print(f"  [SAVED] RF compat     → hemoguard_model.pkl")
 
     meta = {
@@ -520,7 +524,7 @@ def main():
         'lstm_architecture': 'LSTM(64)-Drop(0.3)-LSTM(32)-Drop(0.2)-Dense(16)-Dense(3)',
         'rf_n_estimators': RF_ESTIMATORS,
     }
-    with open(os.path.join(BASE_DIR, 'hemoguard_model_meta.json'), 'w') as f:
+    with open(os.path.join(MODEL_DIR, 'hemoguard_model_meta.json'), 'w') as f:
         json.dump(meta, f, indent=2)
     print(f"  [SAVED] Metadata      → hemoguard_model_meta.json")
 
